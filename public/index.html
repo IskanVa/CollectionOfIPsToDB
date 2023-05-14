@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Отправка POST-запроса</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <form id="source-form">
+      <label for="source-name">Имя источника:</label>
+      <input type="text" id="source-name" name="source" />
+
+      <label for="ip-addresses">IP-адреса:</label>
+      <textarea id="ip-addresses" name="ips" rows="1"></textarea>
+
+      <label for="file-input" id="file-label">Загрузить из файла:</label>
+      <input type="file" id="file-input" accept=".txt" />
+
+      <button type="submit">Добавить источник</button>
+    </form>
+    <script src="script.js"></script>
+  </body>
+</html>

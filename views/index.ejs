@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Добавить IP-адреса</title>
+    <link rel="stylesheet" href="../public/styles.css" />
+  </head>
+  <body>
+    <h1>Добавить IP-адреса</h1>
+    <form action="/api/source" method="POST">
+      <label for="source">Имя источника:</label>
+      <input type="text" id="source" name="source" required />
+      <br />
+      <label for="ips">Список IP-адресов:</label>
+      <textarea id="ips" name="ips" rows="5" required></textarea>
+      <br />
+      <button type="submit">Добавить</button>
+    </form>
+    <script src="../public/script.js"></script>
+  </body>
+</html>
