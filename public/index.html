@@ -6,18 +6,114 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <form id="source-form">
-      <label for="source-name">Имя источника:</label>
-      <input type="text" id="source-name" name="source" />
+    <div id="auth-selection">
+      <h2>***рать</h2>
+      <button id="login-button">Войти</button>
+      <button id="register-button">Зарегистрироваться</button>
+    </div>
 
-      <label for="ip-addresses">IP-адреса:</label>
-      <textarea id="ip-addresses" name="ips" rows="1"></textarea>
+    <div id="auth-container" style="display: none">
+      <h2>Авторизация</h2>
+      <form id="login-form">
+        <label for="login-email">Email:</label>
+        <input type="text" id="login-email" name="email" />
 
-      <label for="file-input" id="file-label">Загрузить из файла:</label>
-      <input type="file" id="file-input" accept=".txt" />
+        <label for="login-password">Пароль:</label>
+        <input type="password" id="login-password" name="password" />
 
-      <button type="submit">Добавить источник</button>
-    </form>
+        <div class="error-container" style="display: block">
+          <div id="login-error"></div>
+        </div>
+
+        <button type="submit">Войти</button>
+      </form>
+    </div>
+
+    <div id="register-container" style="display: none">
+      <h2>Регистрация</h2>
+      <form id="register-form">
+        <label for="register-username">Имя пользователя:</label>
+        <input type="text" id="register-username" name="username" />
+
+        <label for="register-email">Email:</label>
+        <input type="text" id="register-email" name="email" />
+
+        <label for="register-password">Пароль:</label>
+        <input type="password" id="register-password" name="password" />
+
+        <div class="error-container" style="display: block">
+          <div id="register-error"></div>
+        </div>
+
+        <button type="submit">Зарегистрироваться</button>
+      </form>
+    </div>
+
+    <div id="app-container" style="display: none">
+      <h1 id="main-app-h-one">Основное приложение</h1>
+      <form id="source-form">
+        <label for="ip-addresses">IP-адреса:</label>
+        <textarea id="ip-addresses" name="ips" rows="1"></textarea>
+
+        <label for="file-input" id="file-label">Загрузить из файла:</label>
+        <input type="file" id="file-input" accept=".txt" />
+
+        <button type="submit">Добавить источник</button>
+      </form>
+
+      <h1 id="table-h-one">
+        Таблица с IP, которые уже находятся в системе штрафов
+      </h1>
+
+      <form id="download-form-all">
+        <button type="submit">Скачать ВСЁ. УЛЬТРА МЕГА ТОП РАЗРЫВНАЯ</button>
+      </form>
+      <form id="download-form-low">
+        <button type="submit">
+          Скачать файл с низким количеством совпадений. Пойдёт
+        </button>
+      </form>
+      <form id="download-form-big">
+        <button type="submit">
+          Скачать файл с большим количеством совпадений. Хорош
+        </button>
+      </form>
+      <form id="download-form-manual">
+        <button type="submit">
+          РУЧНОЕ конфигурирование рейтингов выгрузки(в разработке). Мега Хорош
+        </button>
+      </form>
+      <form>
+        <div>
+          <input type="checkbox" name="rating" value="1" />
+          <label>Рейтинг 1</label>
+        </div>
+        <div>
+          <input type="checkbox" name="rating" value="2" />
+          <label>Рейтинг 2</label>
+        </div>
+        <div>
+          <input type="checkbox" name="rating" value="3" />
+          <label>Рейтинг 3</label>
+        </div>
+        <div>
+          <input type="checkbox" name="rating" value="4" />
+          <label>Рейтинг 4</label>
+        </div>
+        <div>
+          <input type="checkbox" name="rating" value="5" />
+          <label>Рейтинг 5</label>
+        </div>
+        <div>
+          <input type="checkbox" name="rating" value="6" />
+          <label>Рейтинг 6</label>
+        </div>
+      </form>
+      <!-- Добавьте другие чекбоксы для остальных рейтингов, если нужно -->
+    </div>
+
     <script src="script.js"></script>
+    <script src="login.js"></script>
+    <script src="register.js"></script>
   </body>
 </html>

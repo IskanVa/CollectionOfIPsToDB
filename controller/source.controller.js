@@ -5,6 +5,8 @@ class SourceController {
     let client;
     try {
       const { source, ips } = req.body;
+      console.log(source);
+      console.log(ips);
 
       if (!source || !ips) {
         return res
@@ -66,7 +68,63 @@ class SourceController {
     }
   }
 
-  async getSource(req, res) {}
+  // async getSource(req, res) {
+  //   let client = null; // Инициализация переменной client
+
+  //   try {
+  //     client = await db.connect();
+  //     const result = await client.query(
+  //       "SELECT * FROM penalties ORDER BY rating DESC"
+  //     );
+
+  //     const sources = result.rows.map((row) => ({
+  //       ip: row.ip,
+  //       rating: row.rating,
+  //     }));
+
+  //     res.status(200).json({ sources });
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).json({ message: "Internal server error" });
+  //   } finally {
+  //     if (client) {
+  //       client.release();
+  //     }
+  //   }
+  // }
+  async getSource(req, res) {
+    let client = null;
+
+    try {
+      client = await db.connect();
+
+      let query = "SELECT * FROM penalties";
+      const { rating } = req.query;
+
+      if (rating) {
+        query += ` WHERE rating = ${rating}`;
+      }
+
+      query += " ORDER BY rating DESC";
+
+      const result = await client.query(query);
+
+      const sources = result.rows.map((row) => ({
+        ip: row.ip,
+        rating: row.rating,
+      }));
+
+      res.status(200).json({ sources });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    } finally {
+      if (client) {
+        client.release();
+      }
+    }
+  }
+
   async getOneSource(req, res) {}
   async updateSource(req, res) {}
   async deleteSource(req, res) {}

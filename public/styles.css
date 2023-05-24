@@ -15,12 +15,26 @@ body {
 form {
   max-width: 500px;
   margin: 0 auto;
+  margin-bottom: 10px;
   padding: 30px;
   border-radius: 5px;
   background-color: #ffffff;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 
+form > div {
+  margin-bottom: 10px;
+}
+
+form label {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+form div input[type="checkbox"] {
+  vertical-align: middle;
+  margin-right: 5px;
+}
 label {
   display: block;
   margin-bottom: 10px;
@@ -28,7 +42,28 @@ label {
   color: #333;
 }
 
+h1,
+h2 {
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 15px;
+  margin-top: 15px;
+}
+
+#table-h-one {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+#main-app-h-one {
+  margin-bottom: 15px;
+  margin-top: 15px;
+}
+
 input[type="text"],
+input[type="email"],
+input[type="password"],
 textarea {
   display: block;
   width: 100%;
@@ -57,17 +92,44 @@ button[type="submit"] {
   transition: background-color 0.2s ease-in-out;
 }
 
+#auth-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+#login-button,
+#register-button {
+  margin-top: 8px;
+  display: block;
+  width: 200px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #333;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+#login-button:hover,
+#register-button:hover {
+  background-color: #555;
+}
+
 button[type="submit"]:hover {
   background-color: #555;
 }
 
 #ip-addresses {
+  width: 100%;
+  height: 100%;
   resize: vertical;
-}
-
-#ip-addresses {
-  resize: vertical;
-  min-height: 100px;
 }
 
 label[for="file-input"] {
@@ -96,4 +158,138 @@ label[for="file-input"] {
 
 input[type="file"] {
   display: none;
+}
+
+#register-container,
+#auth-container {
+  display: none;
+}
+
+#app-container {
+  display: none;
+}
+
+.error-container {
+  margin-top: 10px;
+}
+
+#login-error,
+#register-error {
+  display: none;
+  color: red;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+#ip-addresses {
+  width: 100%;
+  height: 100px; /* Установите желаемую высоту поля */
+  resize: vertical;
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+
+/* Добавленные стили для окон регистрации и входа */
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 5px;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-header {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.modal-body {
+  padding: 10px;
+}
+
+.modal-footer {
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  text-align: right;
+}
+
+.modal-form {
+  margin-bottom: 20px;
+}
+
+.modal-form label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.modal-form input[type="text"],
+.modal-form input[type="email"],
+.modal-form input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.modal-form button {
+  width: auto;
+  padding: 8px 20px;
+  border-radius: 5px;
+  border: none;
+  background-color: #333;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.modal-form button:hover {
+  background-color: #555;
+}
+
+.modal-form button[type="submit"] {
+  background-color: #4caf50;
+}
+
+.modal-form button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+.modal-form button[type="button"] {
+  background-color: #ccc;
+}
+
+.modal-form button[type="button"]:hover {
+  background-color: #bbb;
 }
