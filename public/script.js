@@ -2,12 +2,27 @@ const sourceForm = document.getElementById("source-form");
 const fileInput = document.getElementById("file-input");
 const ipAddressField = document.getElementById("ip-addresses");
 const fileLabel = document.getElementById("file-label");
+const teamNameInput = document.getElementById("team-name-input");
+const teamNameButton = document.getElementById("team-name-button");
+const backButtonApp = document.getElementById("back-button-app");
 
-function submitForm(sourceName, ipAddresses) {
+backButtonApp.addEventListener("click", function () {
+  appContainer.style.display = "none";
+  authSelection.style.display = "flex";
+});
+
+let teamName;
+
+function submitForm(sourceName, ipAddresses, teamName) {
   const ipsObject = ipAddresses.map((ip) => ip.trim());
   console.log(ipsObject);
 
-  const data = { source: sourceName, ips: ipsObject };
+  if (!sourceName || !ipsObject.length || !teamName) {
+    alert("Не заполнены все обязательные поля - Имя команды или IP-адреса");
+    return;
+  }
+
+  const data = { source: sourceName, ips: ipsObject, team: teamName };
   console.log(data);
 
   fetch("/api/sources", {
@@ -21,6 +36,7 @@ function submitForm(sourceName, ipAddresses) {
       if (response.ok) {
         return response.json();
       } else {
+        response.text().then((text) => console.log("Response text:", text));
         throw new Error("Ошибка HTTP: " + response.status);
       }
     })
@@ -64,10 +80,8 @@ sourceForm.addEventListener("submit", async (event) => {
     alert("Введите файл с IP адресами");
     return;
   }
-
-  // Вызываем функцию для отправки формы
   // nameOfSource Я хаваю его из login.js
-  submitForm(nameOfSource, ipAddresses);
+  submitForm(nameOfSource, ipAddresses, teamName);
 });
 
 // Обновляем количество строк в текстовом поле при изменении его значения
@@ -76,7 +90,7 @@ ipAddressField.addEventListener("input", () => {
   ipAddressField.rows = rows > 1 ? rows : 2;
 });
 
-////////////////////////////////////////////////////////////////////////
+////
 
 const downloadForm = document.getElementById("download-form-all");
 
@@ -106,68 +120,17 @@ async function getSource() {
     const response = await fetch("/api/sources");
     if (response.ok) {
       const data = await response.json();
-      const sources = data.sources;
-      console.log(sources);
-      return sources;
-    } else {
-      throw new Error("HTTP Error: " + response.status);
-    }
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
-}
 
-//////////////////////////////////////////////
-
-const downloadFormLow = document.getElementById("download-form-low");
-const downloadFormBig = document.getElementById("download-form-big");
-const downloadFormManual = document.getElementById("download-form-manual");
-
-downloadFormLow.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const ratings = [2];
-  const sources = await getSourcesByRatings(ratings);
-  downloadIPAddresses(sources);
-});
-
-downloadFormBig.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const ratings = [3];
-  const sources = await getSourcesByRatings(ratings);
-  downloadIPAddresses(sources);
-});
-
-downloadFormManual.addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  const checkboxes = document.querySelectorAll('input[name="rating"]:checked');
-  const ratings = Array.from(checkboxes).map((checkbox) =>
-    parseInt(checkbox.value)
-  );
-
-  if (ratings.length === 0) {
-    alert("Пожалуйста, выберите хотя бы один рейтинг.");
-    return;
-  }
-
-  const sources = await getSourcesByRatings(ratings);
-  downloadIPAddresses(sources);
-});
-
-async function getSourcesByRatings(ratings) {
-  try {
-    const response = await fetch("/api/sources");
-    if (response.ok) {
-      const data = await response.json();
-      const sources = data.sources.filter((source) =>
-        ratings.includes(source.rating)
-      );
-      if (sources.length === 0) {
-        alert("Этот список пуст");
+      // Проверяем, является ли data объектом и содержит ли он свойство sources
+      if (typeof data === "object" && data.sources) {
+        const sources = data.sources;
+        console.log(sources);
+        return sources;
+      } else {
+        // Если свойства sources нет, мы выводим весь объект data, чтобы увидеть, что в нем находится
+        console.error("Response does not contain a sources property:", data);
+        return [];
       }
-      console.log(sources);
-      return sources;
     } else {
       throw new Error("HTTP Error: " + response.status);
     }
@@ -177,20 +140,42 @@ async function getSourcesByRatings(ratings) {
   }
 }
 
-function downloadIPAddresses(sources) {
-  // Создаем текстовый файл с IP-адресами
-  const text = sources.map((source) => `${source.ip}\n`).join("");
+teamNameButton.addEventListener("click", async (event) => {
+  event.preventDefault();
 
-  // Создаем элемент <a> для скачивания файла
-  const link = document.createElement("a");
-  link.setAttribute(
-    "href",
-    "data:text/plain;charset=utf-8," + encodeURIComponent(text)
-  );
-  link.setAttribute("download", "ip_addresses.txt");
+  teamName = teamNameInput.value;
+  console.log(teamName);
 
-  // Добавляем элемент <a> на страницу и симулируем клик для скачивания файла
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  // Вызываем функцию для проверки имени команды
+  const isTeamValid = await validateTeamName(teamName);
+
+  if (!isTeamValid) {
+    console.log(isTeamValid);
+    alert("Введите существующую команду!");
+    teamName = "";
+  } else {
+    alert("Команда подтверждена!");
+  }
+});
+
+async function validateTeamName(teamName) {
+  try {
+    const response = await fetch(`/api/teams/validate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ teamName }),
+    });
+
+    if (response.status === 200) {
+      return true;
+    } else {
+      console.log(teamName);
+      throw new Error("HTTP Error: " + response.status);
+    }
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 }

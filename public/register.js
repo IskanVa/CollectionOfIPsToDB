@@ -1,8 +1,12 @@
 const registerContainer = document.getElementById("register-container");
 const registerForm = document.getElementById("register-form");
 const registerButton = document.getElementById("register-button");
+const backButtonRegister = document.getElementById("back-button-register");
 
-// register.js (клиентская сторона)
+backButtonRegister.addEventListener("click", function () {
+  registerContainer.style.display = "none";
+  authSelection.style.display = "flex";
+});
 
 function register(username, email, password) {
   const data = { username, email, password };
@@ -18,7 +22,9 @@ function register(username, email, password) {
       if (response.ok) {
         return response.json();
       } else if (response.status === 400) {
-        throw new Error("Пользователь с таким Email уже существует");
+        throw new Error(
+          "Введите валидные данные, длина пароля от 8 знаков, имя пользователя от 5 знаков"
+        );
       } else {
         throw new Error("Ошибка HTTP: " + response.status);
       }

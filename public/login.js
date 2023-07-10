@@ -3,6 +3,12 @@ const appContainer = document.getElementById("app-container");
 const authSelection = document.getElementById("auth-selection");
 const loginButton = document.getElementById("login-button");
 const loginForm = document.getElementById("login-form");
+const backButtonLogin = document.getElementById("back-button-login");
+
+backButtonLogin.addEventListener("click", function () {
+  authContainer.style.display = "none";
+  authSelection.style.display = "flex";
+});
 
 // Функция для отправки запроса на вход (логин)
 function login(email, password) {
@@ -21,9 +27,6 @@ function login(email, password) {
         appContainer.style.display = "block";
         return response.json();
       } else {
-        // alert(
-        // "Ошибка входа. Проверьте правильность учетных данных или попробуйте еще раз позже."
-        // );
         throw new Error("Ошибка HTTP: " + response.status);
       }
     })
@@ -32,11 +35,6 @@ function login(email, password) {
 
       // Сохраняем токен в локальном хранилище (localStorage)
       localStorage.setItem("token", result.token);
-
-      // Продолжаем с другой логикой после успешного входа
-      // ...
-
-      // Скрыть окно авторизации и отобразить основное приложение
     })
     .catch((error) => {
       console.error(error);
@@ -80,5 +78,4 @@ loginForm.addEventListener("submit", async (event) => {
   // Скрываем окно регистрации
   email.value = "";
   password.value = "";
-  // authContainer.style.display = "none";
 });

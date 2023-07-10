@@ -29,12 +29,14 @@ form > div {
 form label {
   display: inline-block;
   margin-left: 5px;
+  margin-top: 10px;
 }
 
 form div input[type="checkbox"] {
   vertical-align: middle;
   margin-right: 5px;
 }
+
 label {
   display: block;
   margin-bottom: 10px;
@@ -292,4 +294,64 @@ input[type="file"] {
 
 .modal-form button[type="button"]:hover {
   background-color: #bbb;
+}
+
+.team-validation-container {
+  width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+}
+
+.team-validation-container input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #f1f1f1;
+  color: #333;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.team-validation-container button[type="submit"] {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #333;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.team-validation-container button[type="submit"]:hover {
+  background-color: #555;
+}
+
+.back-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 100%;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.back-button::before {
+  content: "←";
+}
+
+.back-button:hover {
+  transform: scale(1.1);
 }

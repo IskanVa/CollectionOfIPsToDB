@@ -6,9 +6,25 @@ class AuthController {
   async register(req, res) {
     try {
       const { username, email, password } = req.body;
-      console.log(username);
-      console.log(email);
-      console.log(password);
+
+      // Проверяем длину пароля и имени пользователя
+      if (password.length < 8) {
+        return res
+          .status(400)
+          .json({ message: "Длина пароля должна быть не менее 8 символов" });
+      }
+
+      if (username.length < 5) {
+        return res.status(400).json({
+          message: "Длина имени пользователя должна быть не менее 5 символов",
+        });
+      }
+
+      // Проверяем валидность email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Некорректный email" });
+      }
 
       // Проверяем, есть ли пользователь с таким email в базе данных
       const existingUser = await db.query(
@@ -16,9 +32,9 @@ class AuthController {
         [email]
       );
       if (existingUser.rows.length > 0) {
-        return res
-          .status(400)
-          .json({ message: "Пользователь с таким email уже зарегистрирован" });
+        return res.status(400).json({
+          message: "Пользователь с таким email уже зарегистрирован",
+        });
       }
 
       // Хэшируем пароль перед сохранением в базу данных
