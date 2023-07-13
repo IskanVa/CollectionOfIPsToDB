@@ -57,7 +57,6 @@ class AuthController {
     try {
       const { email, password } = req.body;
 
-      // Проверяем, существует ли пользователь с указанным email
       const user = await db.query("SELECT * FROM users WHERE email = $1", [
         email,
       ]);
@@ -65,7 +64,6 @@ class AuthController {
         return res.status(401).json({ message: "Неверные учетные данные" });
       }
 
-      // Сравниваем хэшированный пароль из базы данных с введенным паролем
       const isPasswordMatch = await bcrypt.compare(
         password,
         user.rows[0].password_hash
@@ -74,19 +72,21 @@ class AuthController {
         return res.status(401).json({ message: "Неверные учетные данные" });
       }
 
-      // Генерируем JWT-токен для аутентификации пользователя
+      const ip = req.ip; // Получаем IP-адрес
+
+      // Обновляем запись пользователя в базе данных, установив IP
+      await db.query("UPDATE users SET ip = $1 WHERE email = $2", [ip, email]);
+
       const token = jwt.sign({ userId: user.rows[0].id }, "secret_key", {
         expiresIn: "30d",
       });
 
-      res.status(200).json({ token });
+      res.status(200).json({ token, ip: ip });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
-
-  // Добавьте другие методы для работы с аутентификацией, если необходимо
 }
 
 module.exports = new AuthController();

@@ -92,3 +92,138 @@ function downloadIPAddresses(sources) {
   link.click();
   document.body.removeChild(link);
 }
+
+const saveRatingsButton = document.getElementById("save-ratings-button");
+const failMessage = document.getElementById("fail-message");
+const successMessage = document.getElementById("success-message");
+const successMessageRate = document.getElementById("success-message-rate");
+
+saveRatingsButton.addEventListener("click", async (event) => {
+  event.preventDefault();
+
+  const checkboxes = document.querySelectorAll('input[name="rating"]:checked');
+  const ratings = Array.from(checkboxes).map((checkbox) =>
+    parseInt(checkbox.value)
+  );
+
+  if (ratings.length === 0) {
+    alert("Пожалуйста, выберите хотя бы один рейтинг.");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `/api/users/${encodeURIComponent(nameOfSource)}/ratings`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ratings }),
+      }
+    );
+
+    if (response.ok) {
+      successMessageRate.innerHTML = "Рейтинги успешно сохранены.";
+      setTimeout(() => {
+        successMessageRate.innerText = "";
+      }, 5000);
+      // alert("Рейтинги успешно сохранены.");
+      if (failMessage) {
+        failMessage.innerText = ""; // Очистите сообщение об ошибке
+      }
+    } else {
+      throw new Error("HTTP Error: " + response.status);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+// Инициализация интервала
+let interval;
+
+// Ваш код для загрузки IP-адресов
+async function downloadIPs() {
+  // Получаем сохраненный IP-адрес
+  const ip = localStorage.getItem("ip");
+
+  // Отправляем запрос на получение данных, включающих IP в URL
+  const response = await fetch(
+    `/api/autodownload/${encodeURIComponent(nameOfSource)}/${encodeURIComponent(
+      ip
+    )}`
+  );
+  if (response.ok) {
+    const data = await response.json();
+    const sources = data.sources;
+    if (sources.length === 0) {
+      failMessage.innerText = "Этот список пуст";
+      setTimeout(() => {
+        failMessage.innerText = "";
+      }, 5000);
+      return;
+    }
+    console.log(sources);
+    downloadIPAddresses(sources);
+  } else {
+    console.error("HTTP Error: " + response.status);
+  }
+}
+
+// Функция для начала автоматической загрузки IP-адресов
+function startAutoDownload() {
+  // Получаем значение интервала обновления из localStorage
+  const refreshRate = localStorage.getItem("refreshRate");
+
+  // Преобразуем интервал обновления в миллисекунды
+  const intervalInMilliseconds = refreshRate * 60 * 1000;
+
+  // Если интервал уже был установлен, его нужно сначала очистить
+  if (interval) {
+    clearInterval(interval);
+  }
+
+  // Настройка интервала
+  interval = setInterval(downloadIPs, intervalInMilliseconds);
+}
+
+// Запуск автоматической загрузки при загрузке страницы
+document.addEventListener("DOMContentLoaded", startAutoDownload);
+
+// Обработка события отправки формы для обновления интервала обновления
+document
+  .getElementById("timer-form")
+  .addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const refreshRate = document.getElementById("timer-input").value;
+
+    const response = await fetch("/api/users/refreshRate", {
+      method: "PUT",
+      body: JSON.stringify({ refreshRate }),
+      headers: {
+        "Content-Type": "application/json",
+        "User-Email": nameOfSource,
+      },
+    });
+
+    if (response.ok) {
+      successMessage.innerText = "Интервал обновления успешно обновлен";
+      setTimeout(() => {
+        successMessage.innerText = "";
+      }, 5000);
+
+      localStorage.setItem("refreshRate", refreshRate);
+
+      // Сразу же запускаем загрузку IP-адресов
+      await downloadIPs();
+
+      // Затем перезапускаем автоматическую загрузку с новым интервалом обновления
+      startAutoDownload();
+    } else {
+      console.error(
+        "Ошибка при обновлении интервала обновления: " + response.status
+      );
+    }
+  });

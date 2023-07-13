@@ -86,17 +86,17 @@
     </form>
     <form id="download-form-low">
       <button type="submit">
-        Скачать файл с низким количеством совпадений
+        Скачать файл с низким количеством совпадений (2)
       </button>
     </form>
     <form id="download-form-big">
       <button type="submit">
-        Скачать файл с большим количеством совпадений
+        Скачать файл с большим количеством совпадений (3)
       </button>
     </form>
     <form>
       <button id="manual-configuration-button" type="submit">
-        РУЧНОЕ конфигурирование рейтингов выгрузки
+        Ручное конфигурирование рейтингов выгрузки
       </button>
     </form>
 
@@ -128,7 +128,20 @@
       <button id="manual-configuration-button-download" type="submit">
         Скачать выбранное
       </button>
+      <button id="save-ratings-button" type="submit">Сохранить рейтинги</button>
+      <p id="success-message-rate"></p>
     </form>
+    <div>
+      <h2>Настройка таймера</h2>
+      <form id="timer-form">
+        <label for="timer-input">Интервал отправления листов (в минутах):</label>
+        <input type="number" id="timer-input" name="timer" min="1" />
+
+        <button type="submit">Сохранить</button>
+        <p id="success-message"></p>
+        <p id="fail-message"></p>
+      </form>
+    </div>
   </div>
 
   <script src="script.js"></script>

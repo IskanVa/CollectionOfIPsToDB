@@ -17,6 +17,17 @@ router.post("/teams/validate", sourceController.validateTeam);
 // GET запрос на получение одного источника по id
 router.get("/sources/:id", sourceController.getOneSource);
 
+router.put("/users/:userEmail/ratings", sourceController.saveRatingsCheckboxes);
+
+router.get("/users/:userEmail/ratings", sourceController.getSelectedRatings);
+
+router.get(
+  "/autodownload/:userEmail/:ip",
+  sourceController.getAutoDownloadSources
+);
+
+router.put("/users/refreshRate", sourceController.putTimerForSend);
+
 // PUT запрос на обновление данных источника по id
 router.put("/sources/:id", sourceController.updateSource);
 

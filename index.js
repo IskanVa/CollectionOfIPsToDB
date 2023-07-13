@@ -6,8 +6,9 @@ const path = require("path");
 const PORT = 8000;
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // Маршрут для отображения HTML-страницы
 app.get("/", (req, res) => {

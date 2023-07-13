@@ -2,6 +2,7 @@ const db = require("../db");
 
 class SourceController {
   async createSource(req, res) {
+    console.time("Inserting IPs");
     console.log("Request body:", req.body);
     let client;
     try {
@@ -68,6 +69,7 @@ class SourceController {
         }
       }
       await client.query("COMMIT");
+      console.timeEnd("Inserting IPs");
       res.status(201).json({
         message: "IPs added successfully",
         source: {
@@ -140,13 +142,66 @@ class SourceController {
       client = await db.connect();
       let query = "SELECT * FROM penalties_summary";
       const { rating } = req.query;
+      let params = [];
 
       if (rating) {
-        query += ` WHERE rating = ${rating}`;
+        query += " WHERE rating = $1";
+        params.push(rating);
       }
       query += " ORDER BY rating DESC";
 
-      const result = await client.query(query);
+      const result = await client.query(query, params);
+
+      const sources = result.rows.map((row) => ({
+        ip: row.ip,
+        rating: row.rating,
+      }));
+
+      res.status(200).json({ sources });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    } finally {
+      if (client) {
+        client.release();
+      }
+    }
+  }
+
+  async getAutoDownloadSources(req, res) {
+    let client = null;
+    try {
+      client = await db.connect();
+      const userEmail = req.params.userEmail;
+      const ip = req.params.ip;
+
+      // Находим пользователя по email
+      const userResult = await client.query(
+        "SELECT * FROM users WHERE email = $1",
+        [userEmail]
+      );
+
+      if (userResult.rowCount === 0) {
+        return res.status(404).json({ message: "Пользователь не найден." });
+      }
+
+      // Проверяем, соответствует ли IP в запросе сохраненному IP
+      if (userResult.rows[0].ip !== ip) {
+        return res.status(400).json({ message: "Некорректный IP адрес" });
+      }
+
+      const ratings = userResult.rows[0].selected_ratings;
+      let query = "SELECT * FROM penalties_summary";
+      let params = [];
+
+      if (ratings.length > 0) {
+        query += " WHERE rating = ANY($1)";
+        params.push(ratings);
+      }
+      query += " ORDER BY rating DESC";
+
+      const result = await client.query(query, params);
+
       const sources = result.rows.map((row) => ({
         ip: row.ip,
         rating: row.rating,
@@ -193,6 +248,93 @@ class SourceController {
       team: existingTeam.rows[0],
       isValid: true,
     });
+  }
+
+  async saveRatingsCheckboxes(req, res) {
+    let client;
+    try {
+      client = await db.connect();
+      const { userEmail } = req.params;
+      const { ratings } = req.body;
+      // Обновить выбранные рейтинги в базе данных...
+      const result = await client.query(
+        "UPDATE users SET selected_ratings = $1 WHERE email = $2 RETURNING *",
+        [ratings, userEmail]
+      );
+      if (result.rowCount === 0) {
+        // Ни один пользователь не был обновлён, что означает, что пользователь с таким адресом электронной почты не был найден
+        return res.status(404).json({ message: "Пользователь не найден." });
+      }
+
+      res.json({ message: "Рейтинги успешно обновлены." });
+    } catch (err) {
+      console.error(err);
+      res
+        .status(500)
+        .json({ message: "Возникла ошибка при обновлении рейтингов." });
+    } finally {
+      if (client) {
+        client.release();
+      }
+    }
+  }
+
+  async getSelectedRatings(req, res) {
+    let client;
+    try {
+      client = await db.connect();
+      const { userEmail } = req.params;
+
+      const result = await client.query(
+        "SELECT selected_ratings, refresh_rate FROM users WHERE email = $1",
+        [userEmail]
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({ message: "Пользователь не найден." });
+      }
+
+      const selectedRatings = result.rows[0].selected_ratings;
+      const refreshRate = result.rows[0].refresh_rate;
+
+      res.json({ selectedRatings, refreshRate });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        message: "Произошла ошибка при получении данных пользователя.",
+      });
+    } finally {
+      if (client) {
+        client.release();
+      }
+    }
+  }
+
+  async putTimerForSend(req, res) {
+    let client = null;
+    try {
+      client = await db.connect();
+      const userEmail = req.headers["user-email"];
+      const refreshRate = req.body.refreshRate;
+
+      const result = await client.query(
+        "UPDATE users SET refresh_rate = $1 WHERE email = $2",
+        [refreshRate, userEmail]
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({ message: "Пользователь не найден." });
+      }
+
+      res.status(200).json({ message: "Интервал обновления успешно обновлен" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    } finally {
+      if (client) {
+        client.release();
+      }
+    }
   }
 
   async getOneSource(req, res) {}

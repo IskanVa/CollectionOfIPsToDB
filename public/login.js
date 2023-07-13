@@ -35,6 +35,7 @@ function login(email, password) {
 
       // Сохраняем токен в локальном хранилище (localStorage)
       localStorage.setItem("token", result.token);
+      localStorage.setItem("ip", result.ip); // Сохраняем IP-адрес
     })
     .catch((error) => {
       console.error(error);
@@ -72,10 +73,49 @@ loginForm.addEventListener("submit", async (event) => {
     console.log("Заполните все поля");
     return;
   }
-
+  const response = await fetch(
+    `/api/users/${encodeURIComponent(email)}/ratings`
+  );
   login(email, password);
+
+  if (response.ok) {
+    const { selectedRatings, refreshRate } = await response.json();
+    // Берём выбранные рейтиги из БД
+    setSelectedRatings(selectedRatings);
+    // Берём таймер из БД
+    document.getElementById("timer-input").value = refreshRate;
+  } else {
+    console.error(
+      "Ошибка при получении выбранных рейтингов или таймера отправления листов:",
+      response.status
+    );
+  }
 
   // Скрываем окно регистрации
   email.value = "";
   password.value = "";
 });
+
+function setSelectedRatings(ratings) {
+  const checkboxes = document.querySelectorAll('input[name="rating"]');
+  checkboxes.forEach((checkbox) => {
+    if (ratings.includes(parseInt(checkbox.value))) {
+      checkbox.checked = true;
+    } else {
+      checkbox.checked = false;
+    }
+  });
+}
+
+// function checkToken() {
+//   const token = localStorage.getItem("token");
+//   console.log(token);
+//   if (token) {
+//     authContainer.style.display = "none";
+//     appContainer.style.display = "block";
+//   } else {
+//     authContainer.style.display = "block";
+//     appContainer.style.display = "none";
+//   }
+// }
+// checkToken();

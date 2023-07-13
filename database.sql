@@ -22,6 +22,9 @@ CREATE TABLE users (
   email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   roles TEXT[] NOT NULL,
+  selected_ratings INT[],
+  ip VARCHAR(45),
+  refresh_rate INTEGER DEFAULT 30,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
